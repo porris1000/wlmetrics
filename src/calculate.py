@@ -4,6 +4,61 @@ import numpy as np
 from conventions import Calculate
 
 
+def calculate_metrics_by_year(worklogs, years): 
+    """
+    Calculates employee performance metrics (KPIs), aggregate and unique
+    metric by year.
+
+    Parameters
+    ----------
+    worklogs : pandas.DataFrame
+        Preprocessed worklogs.
+    years : list
+        List of years to calculate. 
+
+    Returns
+    -------
+    users_and_metrics : dict
+        Dictionary of pandas.DataFrame, years as keys, containing a large 
+        set of features extracted from worklogs by employee (index), including
+        metrics (KPIs), absolute value and standarized, aggregated metrics and
+        final metric. 
+    worklogs_calc : pandas.DataFrame
+        Preprocessed worklogs including new calculated features from issues
+        and projects.
+    issues : pandas.DataFrame
+        Issues features extracted from worklogs.
+    projects : pandas.DataFrame
+        Projects features extracted from worklogs.
+    info : pandas.Series
+        General information from the dataset.
+
+    See Also
+    --------
+    calculate_worklogs, calculate_users_interval, calculate_metrics,
+    calculate_performance, conventions.py
+    """
+        
+    # calculation to reuse in different intervals
+    worklogs_calc, issues, projects, info = calculate_worklogs(worklogs)
+
+    years = [str(y) for y in years]
+    users_and_metrics = {}
+    for year in years:
+        # set interval
+        interval = [str(int(year) * 10000 + 101), str(int(year) * 10000 + 1231)]
+        # compute data for interval
+        users_calc = calculate_users_interval(worklogs_calc, interval)
+        # obtain metrics
+        metrics = calculate_metrics(users_calc)
+        # obtain metrics by dimension and final performance
+        performance = calculate_performance(metrics)
+        data = users_calc.join(metrics).join(performance, rsuffix='_std')
+        users_and_metrics[year] = data
+        
+    return users_and_metrics, worklogs_calc, issues, projects, info
+
+
 def calculate_worklogs(worklogs):
     """
     Adds useful features to worklogs non depending on time period.
@@ -344,7 +399,7 @@ def get_metrics_dict(final=True):
     return metrics_dict
 
 
-def calculate_performance(metrics, limit=1):
+def calculate_performance(metrics, limit=Calculate.AGGREGATION_STD_LIMIT, weights=Calculate.AGGREGATION_WEIGHTS):
     """
     Calculates employee performance aggregated metrics (KPIs).
 
@@ -374,7 +429,8 @@ def calculate_performance(metrics, limit=1):
     
     perf = {category: metrics[cols].mean(axis=1) for category, cols in metrics_dict.items()}
     perf = pd.DataFrame(perf)
-    perf['performance'] = perf.mean(axis=1)
+    weights = pd.Series(weights)
+    perf['performance'] = (perf * weights).sum(axis=1)
     
     return pd.concat([metrics, perf], axis=1)
 

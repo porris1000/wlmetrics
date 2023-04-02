@@ -5,6 +5,7 @@ import matplotlib.ticker as mtick
 import datetime
 
 from calculate import get_metrics_dict
+from conventions import Report
 
 # KPIs format
 metrics_is_percentage = {'engagement': True, 'velocity': False, 'independence': True,
@@ -23,6 +24,38 @@ metrics_colors = {'performance': '#66c2a5',
 cmap = 'Set3'
 
 
+def generate_reports(users_and_metrics, year, history):
+    """
+    Creates the reports of the year for all the employees.
+
+    Parameters
+    ----------
+    users_and_metrics : dict
+        Dictionary of pandas.DataFrame, years as keys, containing a large 
+        set of features extracted from worklogs by employee (index), including
+        metrics (KPIs), absolute value and standarized, aggregated metrics and
+        final metric. 
+    year : int
+        Year that defines the period of the report. It must be a key in 
+        users_and_metrics.
+    history : list
+        List of years that defines the previous periods. It must be a key in 
+        users_and_metrics.
+    """
+    employees, info, kpi, score, yearly, time_split, by_project = data_to_plot(users_and_metrics, year, history)
+    for employee in employees:
+        employee_report(employee, 
+                        year, 
+                        info.loc[employee], 
+                        kpi.loc[employee], 
+                        score, 
+                        time_split.loc[employee],
+                        by_project.loc[employee], 
+                        yearly.loc[employee], 
+                        save=Report.IMAGES_FOLDER + employee, 
+                        dpi=1000)
+    
+    
 def employee_report(employee, year, info, kpi, score, time_split, by_project,
                     yearly, save=None, dpi=1000):
     """
