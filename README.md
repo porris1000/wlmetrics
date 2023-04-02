@@ -73,8 +73,3 @@ history = range(2019, 2022)
 generate_reports(users_and_metrics, year, history)
 
 ```
-
-
-## Report example
-
-![summary](img/rocio.pdf)
