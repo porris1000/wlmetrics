@@ -1,11 +1,16 @@
 # wlmetrics
 
-Employee performance report from agile worklogs dataset
+Employee performance report from agile worklogs dataset.
 
-# ![summary](img/employee_performance_dimensions.png)
+![summary](img/employee_performance_dimensions.png)
 
 
-## Motivation
+## Abstract
+
+This library uses employee worklogs downloaded from Jira in excel format to calculate various KPIs of employee performance. This information can also be viewed in a pdf report generated for each employee. 
+
+
+## List of KPIs
 
 
 | DIMENSION    | Nº | KPI            | DESCRIPTION                                                                   |
@@ -25,6 +30,24 @@ Employee performance report from agile worklogs dataset
 |  mentorship  | 13 | management     | percentage of time   spent on tasks related to planning and organization      |
 |              | 14 | guiance        | assumed tasks review   rate                                                   |
 |              | 15 | responsibility | average percentage   assumed per project                                      |
+
+
+## Contents
+
+| FILE                      | DESCRIPTION                                                                   |
+|:-------------------------:|-------------------------------------------------------------------------------|
+| data/timeUsers/*          | Example of excel files dowloaded from Jira                                    |
+| data/\*.pkl               | Pickle files to store the calculated information from the previous files      |
+| img/*                     | Examples of generated employee performance reports                            |
+| src/conventions.py        | Module to set the parametrization                                             |
+| src/preprocess.py         | Module to read and preprocess the worklogs' files                             |
+| src/calculate.py          | Module to compute the proposed KPIs                                           |
+| src/report.py             | Module to generate the employee performance reports                           |
+| src/quick_start.ipynb     | Notebook to show the complete workflow: read, preprocess, calculate and report|
+| src/individual_kpis.ipynb | Notebook to understand and work with the individual KPIs                      |
+| src/aggregated_kpis.ipynb | Notebook to use and work with the aggregated KPIs                             |
+| requirements.txt          | List of needed libraries                                                      |
+| README.md                 | Library summary                                                               |
 
 
 ## Usage
@@ -50,3 +73,8 @@ history = range(2019, 2022)
 generate_reports(users_and_metrics, year, history)
 
 ```
+
+
+## Report example
+
+![summary](img/rocio.pdf)
